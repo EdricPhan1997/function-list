@@ -16,6 +16,11 @@ function jwtDecode(token: string) {
       .join("")
   );
 
+  const rs = JSON.parse(jsonPayload);
+  // console.log(rs);
+  const parseRs = JSON.parse(rs[`http://schemas.microsoft.com/ws/2008/06/identity/claims/userdata`]);
+  console.log("xu ly trong file decode", parseRs);
+
   return JSON.parse(jsonPayload);
 }
 
@@ -27,6 +32,8 @@ export const isValidToken = (accessToken: string) => {
   }
 
   const decoded = jwtDecode(accessToken);
+
+  // console.log("decoded", decoded.exp);  // time
 
   const currentTime = Date.now() / 1000;
 
