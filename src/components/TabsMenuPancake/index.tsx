@@ -1,5 +1,5 @@
 import { Flex } from "@raca2022/uikit";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import TabsMenu from "./TabsMenu";
 
 const TabsMenuPancake = () => {
@@ -10,6 +10,21 @@ const TabsMenuPancake = () => {
     setIndex(newIndex);
   };
 
+  const memoValue = useMemo(() => {
+    switch (index) {
+      case 0:
+        return <div>Zero</div>;
+      case 1:
+        return <div>One</div>;
+      case 2:
+        return <div>Two</div>;
+      case 3:
+        return <div>Three</div>;
+      default:
+        return <div>Zero</div>;
+    }
+  }, [index]);
+
   return (
     <Flex justifyContent={"center"} flexDirection="column">
       <h1>TabsMenuPancake</h1>
@@ -19,6 +34,7 @@ const TabsMenuPancake = () => {
         <div>Flippers</div>
         <div>Storm</div>
       </TabsMenu>
+      <div>{memoValue}</div>
     </Flex>
   );
 };
