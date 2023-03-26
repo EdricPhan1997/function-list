@@ -12,7 +12,7 @@ export const getListLecturer = createAsyncThunk("cambridge/getListData", async (
   const response: any = await axiosInstance.get(ENDPOINT.LECTURER, {
     params: isEmpty(params) ? defaultParams : params,
     signal: thunkAPI.signal,
-    headers: { Authorization: `Bearer ${localStorage.accessToken}` },
+    // headers: { Authorization: `Bearer ${localStorage.accessToken}` },
   });
 
   const result = response && response.data;
