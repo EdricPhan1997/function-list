@@ -2,23 +2,27 @@ import React, { useCallback, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 
 import Lecturer from "./pages/lecturer";
+import Upload from "./pages/upload";
 import { recoilState, LocalStorageKey } from "./dataStructure";
-import { setSession } from "./utils/setSession";
 
 const App = () => {
   const appState = useRecoilValue(recoilState);
-  const initialize = useCallback(async () => {
-    setSession(appState);
-  }, [appState]);
+
+  console.log(appState);
 
   useEffect(() => {
-    initialize();
-  }, [initialize]);
+    window.localStorage.setItem(
+      LocalStorageKey.APP_STATE,
+      JSON.stringify(appState || "") // convert JavaScript Object to string
+    );
+  }, [appState]);
 
   return (
     <div>
       <h1>Lecturer</h1>
       <Lecturer />
+      <h1>Upload</h1>
+      <Upload />
     </div>
   );
 };
