@@ -1,14 +1,12 @@
 import React from "react";
 import styled from "styled-components";
 import { Box } from "@chakra-ui/react";
+import Connect from "./components/Button/ConnectWallet";
 
 const App = () => {
   return (
-    <Box height={"200vh"} bg="yellow">
-      <Layout>
-        <h1 className="title">Edric</h1>
-        <h2 className="rem">Edric</h2>
-      </Layout>
+    <Box bg="yellow">
+      <Connect />
     </Box>
   );
 };
