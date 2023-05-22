@@ -4,6 +4,8 @@ import AddClass from "./components/AddClassScroll";
 import AddClassClick from "./components/AddClassClick";
 import PushValueInArray from "./components/PushValueInArray";
 import ClickAddActiveMenu from "./components/ClickAddActiveMenu";
+import Start from "./swr/Start";
+import Authentication from "./swr/Authentication";
 
 const App = () => {
   return (
@@ -16,11 +18,14 @@ const App = () => {
       {/* <h1>Add ClassName</h1>
       <AddClassClick /> */}
 
-      <h1>PushValueInArray</h1>
+      {/* <h1>PushValueInArray</h1>
       <PushValueInArray />
 
       <h1>ClickAddActiveMenu</h1>
-      <ClickAddActiveMenu />
+      <ClickAddActiveMenu /> */}
+
+      {/* <Start /> */}
+      <Authentication />
     </div>
   );
 };
