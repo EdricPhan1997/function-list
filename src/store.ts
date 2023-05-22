@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
-import blogReducer from 'redux/blog.reducer'
+import blogReducer from 'redux/old_blog.reducer'
 // render ra mot cai store
 export const store = configureStore({
   reducer: {

@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import { Post } from 'types/blog.type'
 import { useDispatch, useSelector } from 'react-redux'
-import { addPost, addPostRepaire, cancleEdittingPost, finishEditingPost } from 'redux/blog.reducer'
+import { addPost, addPostRepaire, cancleEdittingPost, finishEditingPost } from 'redux/old_blog.reducer'
 import { RootState } from 'store'
 const initialState: Post = {
   description: '',
