@@ -1,5 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
-import blogReducer from 'redux/old_blog.reducer'
+// createReducer, createAction,
+// import blogReducer from 'redux/old_blog.reducer'
+
+// createSlice
+import blogReducer from 'redux/createSlice_blog.slice'
 // render ra mot cai store
 export const store = configureStore({
   reducer: {
