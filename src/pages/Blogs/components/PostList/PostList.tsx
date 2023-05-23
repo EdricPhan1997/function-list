@@ -1,14 +1,24 @@
 import { Fragment } from 'react'
-import { useGetPostsQuery } from 'redux/blog.service'
+import { useDeletePostMutation, useGetPostsQuery } from 'redux/blog.service'
 import Skeleton from '../Skeleton'
 import PostItem from '../PostItem'
+import { useDispatch } from 'react-redux'
+import { startEditPost } from 'redux/rtk_blog.slice'
 
 export default function PostList() {
   // isLoading chỉ dành cho lần fetch đầu tiên
   // isFetching là cho mỗi lần gọi API => Nen dung isFetching
   const { data, isLoading, isFetching } = useGetPostsQuery()
-
+  const dispatch = useDispatch()
+  const [handleDeletePost, handleUpdatePostResult] = useDeletePostMutation()
   console.log('data >>>>>>>>>>', data, isLoading, isFetching)
+
+  const startEditing = (id: string) => {
+    dispatch(startEditPost(id))
+  }
+  const handleDelete = (id: string) => {
+    handleDeletePost(id)
+  }
 
   return (
     <div className='bg-white py-6 sm:py-8 lg:py-12'>
@@ -29,12 +39,7 @@ export default function PostList() {
           {!isFetching && (
             <>
               {data?.map((post) => (
-                <PostItem
-                  post={post}
-                  key={post.id}
-                  // handleDelete={handleDelete}
-                  // handleStartEditing={handleStartEditing}
-                />
+                <PostItem post={post} key={post.id} handleDelete={handleDelete} handleStartEditing={startEditing} />
               ))}
             </>
           )}

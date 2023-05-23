@@ -53,10 +53,44 @@ export const blogApi = createApi({
        * Trong trường hợp này getPosts sẽ chạy lại
        */
       invalidatesTags: (result, error, body) => [{ type: 'Posts', id: 'LIST' }]
+    }),
+    getPost: builder.query<Post, string>({
+      query: (_id) => `posts/${_id}`
+    }),
+    updatePost: builder.mutation<Post, { id: string; body: Post }>({
+      query: (_data) => {
+        return {
+          url: `posts/${_data.id}`,
+          method: 'PUT',
+          body: _data.body
+        }
+      },
+      /*
+      OR
+        query: ({ id, body }) => {
+        return {
+          url: `posts/${id}`,
+          method: 'PUT',
+          body
+        }
+      }
+      */
+      // Trong truong hop nay thi cai getPosts se chay lai
+      invalidatesTags: (result, error, _data) => [{ type: 'Posts', id: _data.id }] // or [{ type: 'Posts', id: result.id }]
+    }),
+    deletePost: builder.mutation<{}, string>({
+      query: (_id) => {
+        return {
+          url: `posts/${_id}`,
+          method: 'DELETE'
+        }
+      },
+      invalidatesTags: (result, error, _id) => [{ type: 'Posts', id: _id }]
     })
   })
 })
 
-export const { useGetPostsQuery, useAddPostMutation } = blogApi
+export const { useGetPostsQuery, useAddPostMutation, useGetPostQuery, useUpdatePostMutation, useDeletePostMutation } =
+  blogApi
 
 // https://www.youtube.com/watch?v=PdfekG8RjPo&t=39s   30:09

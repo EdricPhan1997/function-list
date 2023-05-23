@@ -1,5 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
-import { useAddPostMutation } from 'redux/blog.service'
+import { useSelector } from 'react-redux'
+import { useAddPostMutation, useGetPostQuery, useUpdatePostMutation } from 'redux/blog.service'
+import { RootState } from 'store'
 import { Post } from 'types/blog.type'
 
 const initialState: Omit<Post, 'id'> = {
@@ -15,15 +17,34 @@ interface ErrorForm {
 }
 
 export default function CreatePost() {
-  const [formData, setFormData] = useState<Omit<Post, 'id'>>(initialState)
+  const [formData, setFormData] = useState<Omit<Post, 'id'> | Post>(initialState)
   const [addPost, addPostResult] = useAddPostMutation()
+  const [updatePost, updatePostResult] = useUpdatePostMutation()
+
+  const postId = useSelector((state: RootState) => state.blog.postId)
+  const { data } = useGetPostQuery(postId, { skip: !postId })
+
+  useEffect(() => {
+    if (data) {
+      setFormData(data)
+    }
+  }, [data])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     // const result = addPost(formData).unwrap()
-    addPost(formData).unwrap()
+
+    if (postId) {
+      await updatePost({
+        body: formData as Post,
+        id: postId
+      }).unwrap()
+    } else {
+      await addPost(formData).unwrap()
+    }
     setFormData(initialState)
   }
+  // console.log('data', data)
 
   return (
     <form onSubmit={handleSubmit}>
@@ -113,7 +134,7 @@ export default function CreatePost() {
         </label>
       </div>
       <div>
-        {/* {editingPost && (
+        {Boolean(postId) && (
           <Fragment>
             <button
               type='submit'
@@ -132,16 +153,19 @@ export default function CreatePost() {
               </span>
             </button>
           </Fragment>
-        )} */}
-
-        <button
-          className='group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium text-gray-900 hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-blue-800'
-          type='submit'
-        >
-          <span className='relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900'>
-            Publish Post
-          </span>
-        </button>
+        )}
+        {!Boolean(postId) && (
+          <Fragment>
+            <button
+              className='group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium text-gray-900 hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-blue-800'
+              type='submit'
+            >
+              <span className='relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900'>
+                Publish Post
+              </span>
+            </button>
+          </Fragment>
+        )}
       </div>
     </form>
   )
