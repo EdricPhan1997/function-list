@@ -2,8 +2,9 @@ import { Fragment, useEffect, useState } from 'react'
 import { Post } from 'types/blog.type'
 import { useDispatch, useSelector } from 'react-redux'
 // import { addPost, addPostRepaire, cancleEdittingPost, finishEditingPost } from 'redux/old_blog.reducer'
-import { addPostRepaire, cancleEdittingPost, finishEditingPost } from 'redux/createSlice_blog.slice'
-import { RootState } from 'store'
+import { addPostList, cancleEdittingPost, finishEditingPost, updatePost } from 'redux/createSlice_blog.slice'
+import { RootState, useAppDispatch } from 'store'
+import { unwrapResult } from '@reduxjs/toolkit'
 const initialState: Post = {
   description: '',
   featuredImage: '',
@@ -13,12 +14,18 @@ const initialState: Post = {
   id: ''
 }
 
+interface ErrorForm {
+  publishDate?: string
+}
+
 export default function CreatePost() {
   const [formData, setFormData] = useState<Post>(initialState)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const editingPost = useSelector((state: RootState) => state.blog.editingPost)
+  const loading = useSelector((state: RootState) => state.blog.loading)
+  const [errorForm, setErrorForm] = useState<null | ErrorForm>(null)
 
-  console.log('editingPost', editingPost)
+  console.log('loading >>>>>>>>>>', loading)
 
   useEffect(() => {
     if (editingPost) {
@@ -45,20 +52,42 @@ export default function CreatePost() {
   //   setFormData(initialState)
   // }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (editingPost) {
-      dispatch(finishEditingPost(formData))
+      dispatch(
+        updatePost({
+          postId: editingPost.id,
+          _body: formData
+        })
+      )
+        // De khi co loi nhay vao catch
+        .unwrap()
+        .then((res) => {
+          console.log('updatePost >>>>>>>>>>', res)
+          setFormData(initialState)
+          setErrorForm(null)
+        })
+        .catch((err) => {
+          console.log('res >>>>>>>>>>', err)
+          setErrorForm(err.error)
+        })
     } else {
-      // Co Id truyen vao
-      // const formDataWithId = { ...formData, id: new Date().toISOString() }
-      // dispatch(addPost(formDataWithId))
-
-      // Repaire callback, Khong co Id truyen vao
-      const formDataWithIdRepaire = { ...formData }
-      dispatch(addPostRepaire(formDataWithIdRepaire))
+      try {
+        // const res = await dispatch(addPostList(formData)).unwrap()
+        // console.log('res >>>>>>>>>>', res)
+        // or
+        const res = await dispatch(addPostList(formData))
+        // De khi co loi nhay vao catch
+        unwrapResult(res)
+        console.log('res >>>>>>>>>>', unwrapResult(res))
+        setFormData(initialState)
+        setErrorForm(null)
+      } catch (error: any) {
+        console.log('res >>>>>>>>>>', error)
+        setErrorForm(error.error)
+      }
     }
-    setFormData(initialState)
   }
 
   return (
@@ -112,18 +141,33 @@ export default function CreatePost() {
         </div>
       </div>
       <div className='mb-6'>
-        <label htmlFor='publishDate' className='mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300'>
+        <label
+          htmlFor='publishDate'
+          className={`mb-2 block text-sm font-medium  dark:text-gray-300 ${
+            errorForm?.publishDate ? 'text-red-700' : 'text-gray-900'
+          }`}
+        >
           Publish Date
         </label>
         <input
           type='datetime-local'
           id='publishDate'
-          className='block w-56 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-blue-500'
+          className={`block w-56 rounded-lg border  p-2.5 text-sm  focus:outline-none  ${
+            errorForm?.publishDate
+              ? 'border-red-500 bg-red-50 text-red-900 placeholder-red-700 focus:border-red-500 focus:ring-red-500'
+              : 'border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:ring-blue-500'
+          }`}
           placeholder='Title'
           required
           value={formData.publishDate}
           onChange={(event) => setFormData((prev) => ({ ...prev, publishDate: event.target.value }))}
         />
+        {errorForm?.publishDate && (
+          <p className='mt-2 text-sm text-red-600'>
+            <span className='font-medium'>Lỗi! </span>
+            {errorForm.publishDate}
+          </p>
+        )}
       </div>
       <div className='mb-6 flex items-center'>
         <input
@@ -172,3 +216,8 @@ export default function CreatePost() {
     </form>
   )
 }
+
+/*
+https://flowbite.com/docs/components/skeleton/
+
+*/
