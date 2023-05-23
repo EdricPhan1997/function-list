@@ -33,3 +33,8 @@ handleTodoTextEdit(e, todo.id)
 8. onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) =>
    submitEditText(e)
    }
+
+// thanh toan
+https://www.youtube.com/watch?v=Z-4MaR8tP4Y
+https://github.com/nhatlong19/demo-paypal
+https://www.youtube.com/watch?v=sa9XtaKcSvo

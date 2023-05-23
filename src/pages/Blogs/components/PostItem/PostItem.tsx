@@ -2,8 +2,8 @@ import { Post } from 'types/blog.type'
 
 interface PostItemType {
   post: Post
-  handleDelete: (postId: string) => void
-  handleStartEditing: (postId: string) => void
+  handleDelete?: (postId: string) => void
+  handleStartEditing?: (postId: string) => void
 }
 export default function PostItem({ post, handleDelete, handleStartEditing }: PostItemType) {
   return (
@@ -25,14 +25,14 @@ export default function PostItem({ post, handleDelete, handleStartEditing }: Pos
             <button
               type='button'
               className='rounded-l-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700'
-              onClick={() => handleStartEditing(post.id)}
+              // onClick={() => handleStartEditing(post.id)}
             >
               Edit
             </button>
             <button
               type='button'
               className='rounded-r-lg border-b border-r border-t border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:text-blue-700 focus:ring-2 focus:ring-blue-700'
-              onClick={() => handleDelete(post.id)}
+              // onClick={() => handleDelete(post.id)}
             >
               Delete
             </button>

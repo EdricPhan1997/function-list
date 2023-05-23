@@ -1,17 +1,13 @@
 import { Fragment, useEffect, useState } from 'react'
+import { useAddPostMutation } from 'redux/blog.service'
 import { Post } from 'types/blog.type'
-import { useDispatch, useSelector } from 'react-redux'
-// import { addPost, addPostRepaire, cancleEdittingPost, finishEditingPost } from 'redux/old_blog.reducer'
-import { addPostList, cancleEdittingPost, finishEditingPost, updatePost } from 'redux/createSlice_blog.slice'
-import { RootState, useAppDispatch } from 'store'
-import { unwrapResult } from '@reduxjs/toolkit'
-const initialState: Post = {
+
+const initialState: Omit<Post, 'id'> = {
   description: '',
   featuredImage: '',
   publishDate: '',
   published: false,
-  title: '',
-  id: ''
+  title: ''
 }
 
 interface ErrorForm {
@@ -19,85 +15,20 @@ interface ErrorForm {
 }
 
 export default function CreatePost() {
-  const [formData, setFormData] = useState<Post>(initialState)
-  const dispatch = useAppDispatch()
-  const editingPost = useSelector((state: RootState) => state.blog.editingPost)
-  const loading = useSelector((state: RootState) => state.blog.loading)
-  const [errorForm, setErrorForm] = useState<null | ErrorForm>(null)
-
-  console.log('loading >>>>>>>>>>', loading)
-
-  useEffect(() => {
-    if (editingPost) {
-      setFormData(editingPost || initialState)
-    }
-  }, [editingPost])
-
-  const handleCancelEditingPost = () => {
-    dispatch(cancleEdittingPost())
-  }
-
-  // useEffect(() => {
-  //   setFormData(editingPost || initialState)
-  // }, [editingPost])
-
-  // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault()
-  //   if (editingPost) {
-  //     dispatch(finishEditingPost(formData))
-  //   } else {
-  //     const formDataWithId = { ...formData }
-  //     dispatch(addPost(formDataWithId))
-  //   }
-  //   setFormData(initialState)
-  // }
+  const [formData, setFormData] = useState<Omit<Post, 'id'>>(initialState)
+  const [addPost, addPostResult] = useAddPostMutation()
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (editingPost) {
-      dispatch(
-        updatePost({
-          postId: editingPost.id,
-          _body: formData
-        })
-      )
-        // De khi co loi nhay vao catch
-        .unwrap()
-        .then((res) => {
-          console.log('updatePost >>>>>>>>>>', res)
-          setFormData(initialState)
-          setErrorForm(null)
-        })
-        .catch((err) => {
-          console.log('res >>>>>>>>>>', err)
-          setErrorForm(err.error)
-        })
-    } else {
-      try {
-        // const res = await dispatch(addPostList(formData)).unwrap()
-        // console.log('res >>>>>>>>>>', res)
-        // or
-        const res = await dispatch(addPostList(formData))
-        // De khi co loi nhay vao catch
-        unwrapResult(res)
-        console.log('res >>>>>>>>>>', unwrapResult(res))
-        setFormData(initialState)
-        setErrorForm(null)
-      } catch (error: any) {
-        console.log('res >>>>>>>>>>', error)
-        setErrorForm(error.error)
-      }
-    }
+    // const result = addPost(formData).unwrap()
+    addPost(formData).unwrap()
+    setFormData(initialState)
   }
 
   return (
-    <form onSubmit={handleSubmit} onReset={handleCancelEditingPost}>
+    <form onSubmit={handleSubmit}>
       <div className='mb-6'>
-        <label
-          htmlFor='title'
-          className='mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300'
-          onClick={() => dispatch({ type: '/blog/click' })}
-        >
+        <label htmlFor='title' className='mb-2 block text-sm font-medium text-gray-900 dark:text-gray-300'>
           Title
         </label>
         <input
@@ -143,31 +74,31 @@ export default function CreatePost() {
       <div className='mb-6'>
         <label
           htmlFor='publishDate'
-          className={`mb-2 block text-sm font-medium  dark:text-gray-300 ${
-            errorForm?.publishDate ? 'text-red-700' : 'text-gray-900'
-          }`}
+          // className={`mb-2 block text-sm font-medium  dark:text-gray-300 ${
+          //   errorForm?.publishDate ? 'text-red-700' : 'text-gray-900'
+          // }`}
         >
           Publish Date
         </label>
         <input
           type='datetime-local'
           id='publishDate'
-          className={`block w-56 rounded-lg border  p-2.5 text-sm  focus:outline-none  ${
-            errorForm?.publishDate
-              ? 'border-red-500 bg-red-50 text-red-900 placeholder-red-700 focus:border-red-500 focus:ring-red-500'
-              : 'border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:ring-blue-500'
-          }`}
+          // className={`block w-56 rounded-lg border  p-2.5 text-sm  focus:outline-none  ${
+          //   errorForm?.publishDate
+          //     ? 'border-red-500 bg-red-50 text-red-900 placeholder-red-700 focus:border-red-500 focus:ring-red-500'
+          //     : 'border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:ring-blue-500'
+          // }`}
           placeholder='Title'
           required
           value={formData.publishDate}
           onChange={(event) => setFormData((prev) => ({ ...prev, publishDate: event.target.value }))}
         />
-        {errorForm?.publishDate && (
+        {/* {errorForm?.publishDate && (
           <p className='mt-2 text-sm text-red-600'>
             <span className='font-medium'>Lỗi! </span>
             {errorForm.publishDate}
           </p>
-        )}
+        )} */}
       </div>
       <div className='mb-6 flex items-center'>
         <input
@@ -182,7 +113,7 @@ export default function CreatePost() {
         </label>
       </div>
       <div>
-        {editingPost && (
+        {/* {editingPost && (
           <Fragment>
             <button
               type='submit'
@@ -201,17 +132,16 @@ export default function CreatePost() {
               </span>
             </button>
           </Fragment>
-        )}
-        {!editingPost && (
-          <button
-            className='group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium text-gray-900 hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-blue-800'
-            type='submit'
-          >
-            <span className='relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900'>
-              Publish Post
-            </span>
-          </button>
-        )}
+        )} */}
+
+        <button
+          className='group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium text-gray-900 hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-blue-800'
+          type='submit'
+        >
+          <span className='relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900'>
+            Publish Post
+          </span>
+        </button>
       </div>
     </form>
   )
