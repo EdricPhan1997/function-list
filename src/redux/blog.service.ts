@@ -5,10 +5,25 @@ import { CustomError } from 'utils/helper'
 export const blogApi = createApi({
   reducerPath: 'blogApi',
   tagTypes: ['Posts'], // Những kiểu tag cho phép dùng trong blogApi
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/' }),
+  keepUnusedDataFor: 10,
+  baseQuery: fetchBaseQuery({
+    baseUrl: 'http://localhost:4000/',
+    prepareHeaders: (headers) => {
+      headers.set('authorization', `Bearer ${localStorage.getItem('token') || 'ABC'}`)
+      return headers
+    }
+  }),
+  // focus vao tab thi se refetch lai
+  refetchOnFocus: true,
+  // mat mang thi se refetch lai
+  // refetchOnReconnect: true,
   endpoints: (builder) => ({
     getPosts: builder.query<Post[], void>({
       query: () => 'posts', // method khong co argument
+      /*
+      keepUnusedDataFor: 10,
+      */
+
       /**
        * providesTags có thể là array hoặc callback return array
        * Nếu có bất kỳ một invalidatesTag nào match với providesTags này
@@ -56,7 +71,15 @@ export const blogApi = createApi({
       invalidatesTags: (result, error, body) => (error ? [] : [{ type: 'Posts', id: 'LIST' }])
     }),
     getPost: builder.query<Post, string>({
-      query: (_id) => `posts/${_id}`
+      // query: (_id) => `posts/${_id}`
+      query: (_id) => ({
+        url: `posts/${_id}`,
+        headers: { hello: 'EdricPhan' },
+        params: {
+          first_name: 'Hieu',
+          last_name: 'Phan'
+        }
+      })
     }),
     updatePost: builder.mutation<Post, { id: string; body: Post }>({
       query: (_data) => {
@@ -104,4 +127,4 @@ export const blogApi = createApi({
 export const { useGetPostsQuery, useAddPostMutation, useGetPostQuery, useUpdatePostMutation, useDeletePostMutation } =
   blogApi
 
-// https://www.youtube.com/watch?v=PdfekG8RjPo&t=39s   30:09
+// Tai lieu: https://redux-toolkit.js.org/rtk-query/usage/cache-behavior#re-fetching-on-window-focus-with-refetchonfocus
