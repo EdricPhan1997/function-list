@@ -11,7 +11,7 @@ export default function PostList() {
   const { data, isLoading, isFetching } = useGetPostsQuery()
   const dispatch = useDispatch()
   const [handleDeletePost, handleUpdatePostResult] = useDeletePostMutation()
-  console.log('data >>>>>>>>>>', data, isLoading, isFetching)
+  // console.log('data >>>>>>>>>>', data, isLoading, isFetching)
 
   const startEditing = (id: string) => {
     dispatch(startEditPost(id))

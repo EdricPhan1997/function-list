@@ -1,11 +1,13 @@
 import Blog from 'pages/Blogs/Blog'
-import React from 'react'
-
+import React, { Fragment } from 'react'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 const App = () => {
   return (
-    <div>
+    <Fragment>
+      <ToastContainer />
       <Blog />
-    </div>
+    </Fragment>
   )
 }
 

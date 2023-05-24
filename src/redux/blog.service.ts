@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { Post } from 'types/blog.type'
+import { CustomError } from 'utils/helper'
 
 export const blogApi = createApi({
   reducerPath: 'blogApi',
@@ -52,17 +53,27 @@ export const blogApi = createApi({
        * match với nó sẽ bị gọi lại
        * Trong trường hợp này getPosts sẽ chạy lại
        */
-      invalidatesTags: (result, error, body) => [{ type: 'Posts', id: 'LIST' }]
+      invalidatesTags: (result, error, body) => (error ? [] : [{ type: 'Posts', id: 'LIST' }])
     }),
     getPost: builder.query<Post, string>({
       query: (_id) => `posts/${_id}`
     }),
     updatePost: builder.mutation<Post, { id: string; body: Post }>({
       query: (_data) => {
-        return {
-          url: `posts/${_data.id}`,
-          method: 'PUT',
-          body: _data.body
+        // Error do nguoi dung code sai
+        // throw new Error('Hahahahaha')
+        try {
+          // throw new Error('Hahahahaha')
+          // let a: any = null
+          // a.b = 1
+
+          return {
+            url: `posts/${_data.id}`,
+            method: 'PUT',
+            body: _data.body
+          }
+        } catch (error: any) {
+          throw new CustomError(error.message)
         }
       },
       /*
@@ -76,7 +87,7 @@ export const blogApi = createApi({
       }
       */
       // Trong truong hop nay thi cai getPosts se chay lai
-      invalidatesTags: (result, error, _data) => [{ type: 'Posts', id: _data.id }] // or [{ type: 'Posts', id: result.id }]
+      invalidatesTags: (result, error, _data) => (error ? [] : [{ type: 'Posts', id: _data.id }]) // or [{ type: 'Posts', id: result.id }]
     }),
     deletePost: builder.mutation<{}, string>({
       query: (_id) => {

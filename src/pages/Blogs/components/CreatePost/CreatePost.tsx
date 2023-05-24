@@ -1,8 +1,11 @@
-import { Fragment, useEffect, useState } from 'react'
+import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query'
+import { Fragment, useEffect, useMemo, useState } from 'react'
+import classNames from 'classnames'
 import { useSelector } from 'react-redux'
 import { useAddPostMutation, useGetPostQuery, useUpdatePostMutation } from 'redux/blog.service'
 import { RootState } from 'store'
 import { Post } from 'types/blog.type'
+import { isEntityError, isFetchBaseQueryError } from 'utils/helper'
 
 const initialState: Omit<Post, 'id'> = {
   description: '',
@@ -12,9 +15,16 @@ const initialState: Omit<Post, 'id'> = {
   title: ''
 }
 
-interface ErrorForm {
-  publishDate?: string
-}
+// type FormError = {
+//   [key in keyof Omit<Post, 'id'>]: string
+// }
+
+// or
+type FormError =
+  | {
+      [key in keyof typeof initialState]: string
+    }
+  | null
 
 export default function CreatePost() {
   const [formData, setFormData] = useState<Omit<Post, 'id'> | Post>(initialState)
@@ -23,6 +33,22 @@ export default function CreatePost() {
 
   const postId = useSelector((state: RootState) => state.blog.postId)
   const { data } = useGetPostQuery(postId, { skip: !postId })
+
+  const errorForm: FormError = useMemo(() => {
+    const errorResult = postId ? updatePostResult.error : addPostResult.error
+    // console.log('errorResult', errorResult)
+    // if ((errorResult as FetchBaseQueryError).data && (errorResult as FetchBaseQueryError).status) {
+    //   return (errorResult as FetchBaseQueryError).data?.error
+    // }
+    if (isEntityError(errorResult)) {
+      // Có thể ép kiểu một cách an toàn chỗ này, vì chúng ta đã kiểm tra chắc chắn rồi
+      // Nếu không muốn ép kiểu thì có thể khai báo cái interface `EntityError` sao cho data.error tương đồng với FormError là được
+      // console.log('errorResult', errorResult)
+
+      return errorResult.data.error as FormError
+    }
+    return null
+  }, [postId, updatePostResult, addPostResult])
 
   useEffect(() => {
     if (data) {
@@ -33,17 +59,21 @@ export default function CreatePost() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     // const result = addPost(formData).unwrap()
-
-    if (postId) {
-      await updatePost({
-        body: formData as Post,
-        id: postId
-      }).unwrap()
-    } else {
-      await addPost(formData).unwrap()
+    try {
+      if (postId) {
+        await updatePost({
+          body: formData as Post,
+          id: postId
+        }).unwrap()
+      } else {
+        await addPost(formData).unwrap()
+      }
+      setFormData(initialState)
+    } catch (error) {
+      console.log('error', error)
     }
-    setFormData(initialState)
   }
+
   // console.log('data', data)
 
   return (
@@ -95,31 +125,34 @@ export default function CreatePost() {
       <div className='mb-6'>
         <label
           htmlFor='publishDate'
-          // className={`mb-2 block text-sm font-medium  dark:text-gray-300 ${
-          //   errorForm?.publishDate ? 'text-red-700' : 'text-gray-900'
-          // }`}
+          className={classNames('mb-2 block text-sm font-medium  dark:text-gray-300 ', {
+            'text-red-700': Boolean(errorForm?.publishDate),
+            'text-gray-900': !Boolean(errorForm?.publishDate)
+          })}
         >
           Publish Date
         </label>
         <input
           type='datetime-local'
           id='publishDate'
-          // className={`block w-56 rounded-lg border  p-2.5 text-sm  focus:outline-none  ${
-          //   errorForm?.publishDate
-          //     ? 'border-red-500 bg-red-50 text-red-900 placeholder-red-700 focus:border-red-500 focus:ring-red-500'
-          //     : 'border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:ring-blue-500'
-          // }`}
+          className={classNames('block w-56 rounded-lg border  p-2.5 text-sm  focus:outline-none', {
+            'border-red-500 bg-red-50 text-red-900 placeholder-red-700 focus:border-red-500 focus:ring-blue-500':
+              Boolean(errorForm?.publishDate),
+            'border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:ring-blue-500': !Boolean(
+              errorForm?.publishDate
+            )
+          })}
           placeholder='Title'
           required
           value={formData.publishDate}
           onChange={(event) => setFormData((prev) => ({ ...prev, publishDate: event.target.value }))}
         />
-        {/* {errorForm?.publishDate && (
+        {errorForm?.publishDate && (
           <p className='mt-2 text-sm text-red-600'>
             <span className='font-medium'>Lỗi! </span>
             {errorForm.publishDate}
           </p>
-        )} */}
+        )}
       </div>
       <div className='mb-6 flex items-center'>
         <input
