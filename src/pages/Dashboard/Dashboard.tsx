@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import AuthGuard from "src/auth/AuthGuard";
 
 const Dashboard = () => {
-  return <AuthGuard>DashboardAdmin</AuthGuard>;
+  return <div>DashboardAdmin</div>;
 };
 
 export default Dashboard;

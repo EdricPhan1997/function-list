@@ -14,3 +14,4 @@ const Loadable = (Component: ElementType) => (props: any) =>
 export const LoginPage = Loadable(lazy(() => import("src/pages/auth/LoginPages")));
 export const HomePage = Loadable(lazy(() => import("src/pages/Home")));
 export const DashboardPage = Loadable(lazy(() => import("src/pages/Dashboard")));
+export const OverviewPage = Loadable(lazy(() => import("src/pages/Overview")));

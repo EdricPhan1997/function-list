@@ -1,5 +1,5 @@
 // routes
-// import { PATH_DASHBOARD } from './routes/paths';
+import { PATH_DASHBOARD } from "./routes/paths";
 
 // API
 // ----------------------------------------------------------------------
@@ -10,7 +10,7 @@ export const HOST_API_KEY_CAMBRIDGE = process.env.REACT_APP_CAMBRIDGE_HOST_API_K
 export const MAP_API = process.env.REACT_APP_MAPBOX_API;
 
 // ROOT PATH AFTER LOGIN SUCCESSFUL
-// export const PATH_AFTER_LOGIN = PATH_DASHBOARD.overview.root; // as '/dashboard/app'
+export const PATH_AFTER_LOGIN = PATH_DASHBOARD.overview.root; // as '/dashboard/app'
 
 // LAYOUT
 // ----------------------------------------------------------------------

@@ -24,7 +24,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     checkTokenValidity();
 
     // Check token validity every 5 seconds
-    const intervalId = setInterval(checkTokenValidity, 50000);
+    const intervalId = setInterval(checkTokenValidity, 10000);
 
     // Clean up the interval when the component unmounts
     return () => clearInterval(intervalId);
