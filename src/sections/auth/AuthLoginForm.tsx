@@ -1,6 +1,6 @@
 import React from "react";
 import * as Yup from "yup";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { FormProvider as Form, UseFormReturn } from "react-hook-form";
 
 import { useForm } from "react-hook-form";
@@ -20,6 +20,7 @@ type FormValuesProps = {
 
 const AuthLoginForm = () => {
   const { login } = useAuthContext();
+  const navigate = useNavigate();
 
   const LoginSchema = Yup.object().shape({
     Username: Yup.string().email("Email must be a valid email").required("Email is required"),
@@ -54,9 +55,10 @@ const AuthLoginForm = () => {
 
       await login(formData);
       reset();
+      navigate("/dashboard");
     } catch (error: any) {
       console.error(error);
-      reset();
+      // reset();
       setError("afterSubmit", {
         ...error,
         message: error.resultMessage || "",
